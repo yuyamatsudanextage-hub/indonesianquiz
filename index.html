@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>インドネシア語クイズ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#140d16;
+  --glass:rgba(32,17,36,.70);
+  --glass2:rgba(32,17,36,.86);
+  --edge:rgba(255,236,214,.15);
+  --gold:#ffc24a;
+  --coral:#ff6b6b;
+  --teal:#3fd9c6;
+  --cream:#fff3e2;
+  --dim:#b79ab0;
+  --wrong:#ff7f7f;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN',sans-serif;
+  background:var(--ink);color:var(--cream);min-height:100vh;overflow-x:hidden}
+
+/* ===== parallax stage ===== */
+#stage{position:fixed;inset:0;z-index:0;overflow:hidden;background:
+  linear-gradient(180deg,#2b1033 0%,#5e1f48 26%,#a53a52 50%,#e0693f 68%,#f4a04a 80%,#f7c76b 100%)}
+.layer{position:absolute;left:0;width:100%;will-change:transform}
+#sun{position:absolute;left:50%;width:180px;height:180px;margin-left:-90px;top:40%;
+  border-radius:50%;background:radial-gradient(circle,#fff2c4 0%,#ffcf6b 45%,rgba(255,180,90,0) 72%);
+  will-change:transform}
+#scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(20,13,22,.16) 0%,rgba(20,13,22,.52) 40%,rgba(20,13,22,.92) 80%,var(--ink) 100%)}
+.app{position:relative;z-index:2;max-width:440px;margin:0 auto;padding:0 14px 56px}
+
+/* ===== hero ===== */
+.hero{min-height:88vh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:26px}
+.kicker{font-size:12px;letter-spacing:.14em;color:var(--cream);opacity:.85;margin-bottom:14px;
+  text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.latin{font-family:'Outfit',sans-serif;font-weight:300;font-size:40px;line-height:1;
+  color:var(--gold);margin-bottom:8px;letter-spacing:-.01em;text-shadow:0 3px 20px rgba(0,0,0,.6)}
+h1{font-size:40px;line-height:1.1;font-weight:900;letter-spacing:-.02em;text-shadow:0 3px 24px rgba(0,0,0,.72)}
+.lede{color:var(--cream);opacity:.88;font-size:14px;line-height:1.9;margin-top:16px;
+  text-shadow:0 2px 14px rgba(0,0,0,.7);max-width:34ch}
+
+.navbtns{display:flex;gap:10px;margin:6px 0 16px}
+.navbtns button{flex:1;border:none;border-radius:19px;padding:20px 10px;font-family:inherit;
+  font-size:16px;font-weight:900;cursor:pointer;transition:.1s;line-height:1.4}
+.toStudy{background:var(--teal);color:#062b28;box-shadow:0 5px 0 #23a294}
+.toQuiz{background:var(--coral);color:#fff;box-shadow:0 5px 0 #cc4545}
+.navbtns button:active{transform:translateY(3px);box-shadow:none}
+.navbtns button small{display:block;font-size:11px;font-weight:600;opacity:.78;margin-top:3px}
+
+.panel{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--edge);border-radius:24px;padding:22px 19px;margin-bottom:14px}
+.panel > h2{font-size:15px;font-weight:900;margin-bottom:14px}
+.screen{display:none}
+.screen.on{display:block}
+.grp{margin-bottom:20px}
+.grp h3{font-size:13.5px;font-weight:700;margin-bottom:10px}
+.grp h3 em{font-style:normal;color:var(--dim);font-weight:400;font-size:11.5px;margin-left:6px}
+.opts{display:flex;flex-wrap:wrap;gap:7px}
+.opt{border:1.5px solid var(--edge);background:rgba(255,243,226,.05);color:var(--cream);
+  border-radius:12px;padding:9px 13px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:.15s}
+.opt:active{transform:scale(.95)}
+.opt.sel{background:var(--gold);color:#2a1a00;border-color:var(--gold);font-weight:700}
+.opt.cat.sel{background:var(--teal);border-color:var(--teal);color:#062b28}
+.mini{display:flex;gap:7px;margin-bottom:10px}
+.mini button{flex:1;border:1px solid var(--edge);background:transparent;color:var(--dim);
+  border-radius:10px;padding:8px;font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer}
+.start{width:100%;border:none;border-radius:17px;padding:19px;font-family:inherit;font-size:18px;
+  font-weight:900;background:var(--coral);color:#fff;cursor:pointer;box-shadow:0 6px 0 #cc4545;transition:.1s}
+.start:active{transform:translateY(4px);box-shadow:0 2px 0 #cc4545}
+.tiny{font-size:11.5px;color:var(--dim);line-height:1.8;margin-top:16px}
+
+.topbar{display:flex;align-items:center;padding:22px 0 16px;position:sticky;top:0;z-index:5;
+  background:linear-gradient(180deg,var(--ink) 55%,transparent)}
+.back{background:none;border:none;color:var(--dim);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.topbar h2{font-size:18px;font-weight:900;margin:0 auto}
+.topbar .sp{width:54px}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:12px;margin-bottom:14px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1.5px solid var(--edge);background:rgba(32,17,36,.6);color:var(--dim);
+  border-radius:99px;padding:9px 15px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.tab.on{background:var(--teal);border-color:var(--teal);color:#062b28}
+.count{font-size:12px;color:var(--dim);margin-bottom:12px}
+
+.card{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--edge);border-radius:18px;padding:16px 17px;margin-bottom:9px}
+.card .jp{font-size:13.5px;color:var(--dim);margin-bottom:4px}
+.card .kana{font-size:21px;font-weight:900;color:var(--gold);line-height:1.35;word-break:break-word}
+.card .sc{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;color:var(--cream);
+  opacity:.62;margin-top:5px;letter-spacing:.01em}
+.card .nt{font-size:12px;color:var(--dim);line-height:1.7;margin-top:8px}
+
+.hud{display:flex;align-items:center;gap:10px;padding-top:22px;margin-bottom:7px}
+.hearts{font-size:17px;letter-spacing:2px}
+.qcount{font-size:12px;color:var(--dim);margin-left:auto;font-weight:700}
+.bar{height:6px;background:rgba(255,243,226,.14);border-radius:99px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));width:0;transition:width .3s;border-radius:99px}
+.combo{display:inline-block;font-family:'Outfit',sans-serif;font-weight:800;font-size:12px;color:var(--gold);
+  border:1.5px solid var(--gold);border-radius:99px;padding:3px 9px;opacity:0;transform:scale(.7);transition:.2s}
+.combo.on{opacity:1;transform:scale(1)}
+.qcard{background:var(--glass2);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--edge);border-radius:26px;padding:30px 20px;text-align:center;margin-bottom:16px}
+.qlabel{font-size:11.5px;color:var(--dim);margin-bottom:14px}
+.qmain{font-size:29px;font-weight:900;line-height:1.32;word-break:break-word}
+.qmain.kana{color:var(--gold)}
+.qscript{font-family:'Outfit',sans-serif;font-weight:600;font-size:16px;color:var(--dim);margin-top:10px;display:none}
+.qscript.show{display:block}
+.choices{display:flex;flex-direction:column;gap:9px}
+.ch{width:100%;text-align:left;border:1.5px solid var(--edge);background:var(--glass);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--cream);border-radius:16px;
+  padding:16px 17px;font-family:inherit;font-size:16.5px;font-weight:500;cursor:pointer;transition:.14s;line-height:1.4}
+.ch:active{transform:scale(.985)}
+.ch.right{background:var(--teal);border-color:var(--teal);color:#062b28;font-weight:700}
+.ch.bad{background:rgba(255,127,127,.22);border-color:var(--wrong);color:var(--wrong)}
+.ch.mute{opacity:.35}
+.fb{margin-top:15px;padding:16px;border-radius:17px;font-size:14px;line-height:1.75;display:none;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.fb.on{display:block}
+.fb.good{background:rgba(63,217,198,.16);border:1px solid rgba(63,217,198,.42)}
+.fb.bad{background:rgba(255,127,127,.13);border:1px solid rgba(255,127,127,.4)}
+.fb b{font-weight:700}
+.fb .sp2{font-family:'Outfit',sans-serif;font-weight:600;opacity:.75}
+.fb .note{color:var(--dim);font-size:12.5px;margin-top:7px;display:block;line-height:1.7}
+.next{width:100%;border:none;border-radius:15px;padding:16px;font-family:inherit;font-size:16px;
+  font-weight:800;background:var(--cream);color:var(--ink);cursor:pointer;margin-top:11px}
+.next:active{transform:scale(.98)}
+
+.rhead{text-align:center;padding:36px 0 18px}
+.rscore{font-family:'Outfit',sans-serif;font-size:74px;font-weight:800;line-height:1;color:var(--gold);
+  text-shadow:0 3px 22px rgba(0,0,0,.6)}
+.rscore small{font-size:22px;color:var(--dim);font-weight:600}
+.rmsg{font-size:18px;font-weight:900;margin-top:12px}
+.rsub{color:var(--dim);font-size:13px;margin-top:8px;line-height:1.8}
+.stats{display:flex;gap:8px;margin:20px 0}
+.stat{flex:1;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--edge);border-radius:17px;padding:15px 8px;text-align:center}
+.stat b{display:block;font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;color:var(--teal)}
+.stat span{font-size:10.5px;color:var(--dim);margin-top:3px;display:block}
+.rlist h3{font-size:14px;font-weight:700;margin:20px 0 10px}
+.rbtns{display:flex;gap:9px;margin-top:22px}
+.rbtns button{flex:1;border:none;border-radius:15px;padding:17px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.again{background:var(--coral);color:#fff}
+.home{background:rgba(32,17,36,.7);color:var(--cream);border:1.5px solid var(--edge)!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.layer,#sun{transform:none!important}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="sun"></div>
+  <!-- 遠景の山（ゆっくり動く） -->
+  <svg class="layer" id="L1" viewBox="0 0 400 200" preserveAspectRatio="none" style="bottom:26%;height:34vh">
+    <path d="M0 200 L0 132 L54 96 L96 120 L150 70 L182 96 L214 60 L250 92 L300 56 L340 88 L400 118 L400 200Z"
+      fill="#6b2a55" opacity=".62"/>
+  </svg>
+  <!-- 火山のシルエット -->
+  <svg class="layer" id="L2" viewBox="0 0 400 200" preserveAspectRatio="none" style="bottom:16%;height:36vh">
+    <path d="M0 200 L0 150 L70 118 L120 148 L188 62 L206 62 L280 146 L340 116 L400 148 L400 200Z"
+      fill="#46183f" opacity=".85"/>
+    <path d="M188 62 L197 54 L206 62 L200 70Z" fill="#7d2b4a" opacity=".9"/>
+  </svg>
+  <!-- 棚田の段 -->
+  <svg class="layer" id="L3" viewBox="0 0 400 200" preserveAspectRatio="none" style="bottom:2%;height:32vh">
+    <path d="M0 60 Q100 40 200 58 T400 46 L400 90 Q290 74 190 90 T0 96Z" fill="#2c1030" opacity=".92"/>
+    <path d="M0 104 Q110 84 210 102 T400 88 L400 140 Q280 122 180 140 T0 144Z" fill="#230c28" opacity=".95"/>
+    <path d="M0 150 Q120 132 220 150 T400 134 L400 200 L0 200Z" fill="#1a0820"/>
+  </svg>
+  <!-- 手前のヤシ（速く動く） -->
+  <svg class="layer" id="L4" viewBox="0 0 400 220" preserveAspectRatio="none" style="bottom:0;height:40vh">
+    <g fill="#120518">
+      <path d="M44 220 C46 170 48 140 52 112 L60 112 C57 142 56 174 58 220Z"/>
+      <path d="M56 112 C34 96 18 96 4 106 C22 92 42 92 56 106Z"/>
+      <path d="M56 110 C40 84 22 74 4 74 C26 66 46 80 58 104Z"/>
+      <path d="M58 110 C74 86 96 76 116 80 C96 78 76 90 62 108Z"/>
+      <path d="M58 108 C78 100 100 102 114 112 C96 96 74 96 58 104Z"/>
+      <path d="M352 220 C350 176 348 146 344 120 L336 120 C339 148 340 178 338 220Z"/>
+      <path d="M340 120 C360 104 378 104 392 114 C374 100 356 100 340 114Z"/>
+      <path d="M340 118 C356 92 374 82 392 82 C370 74 350 88 338 112Z"/>
+      <path d="M338 118 C322 94 300 84 280 88 C300 86 320 98 334 116Z"/>
+    </g>
+  </svg>
+</div>
+<div id="scrim"></div>
+<div class="app">
+
+<section class="screen on" id="s-home">
+  <div class="hero">
+    <div class="kicker">インドネシアのことば</div>
+    <div class="latin">Bahasa Indonesia</div>
+    <h1>インドネシア語<br>クイズ</h1>
+    <p class="lede">一覧で覚えてから4択に挑戦する流れです。つづりはローマ字なので、読みと一緒に目で追えます。</p>
+  </div>
+
+  <div class="navbtns">
+    <button class="toStudy" id="btnStudy">一覧で覚える<small>ジャンル別に読む</small></button>
+    <button class="toQuiz" id="btnToQuiz">クイズに挑戦<small>4択・ライフ3</small></button>
+  </div>
+
+  <div class="panel" id="setupBox" style="display:none">
+    <h2>クイズの設定</h2>
+    <div class="grp">
+      <h3>出題のむき</h3>
+      <div class="opts" id="modeOpts">
+        <button class="opt sel" data-mode="jp2si">日本語 → インドネシア語</button>
+        <button class="opt" data-mode="si2jp">インドネシア語 → 日本語</button>
+        <button class="opt" data-mode="mix">ミックス</button>
+      </div>
+    </div>
+    <div class="grp">
+      <h3>問題数</h3>
+      <div class="opts" id="lenOpts">
+        <button class="opt" data-len="5">5問</button>
+        <button class="opt sel" data-len="10">10問</button>
+        <button class="opt" data-len="20">20問</button>
+      </div>
+    </div>
+    <div class="grp">
+      <h3>ジャンル<em>複数えらべます</em></h3>
+      <div class="mini">
+        <button id="selAll">ぜんぶ選ぶ</button>
+        <button id="selNone">ぜんぶ外す</button>
+      </div>
+      <div class="opts" id="catOpts"></div>
+    </div>
+    <div class="grp">
+      <h3>つづり（ローマ字）</h3>
+      <div class="opts" id="scriptOpts">
+        <button class="opt sel" data-script="off">出さない</button>
+        <button class="opt" data-script="on">小さく出す</button>
+      </div>
+    </div>
+    <button class="start" id="btnStart">はじめる</button>
+    <p class="tiny">カタカナは近い音をあてたものです。インドネシア語はローマ字をほぼそのまま読めますが、e には2種類の音があり、語末の k や t はほとんど発音されません。正確な発音は音声教材や現地の人で確かめてください。</p>
+  </div>
+</section>
+
+<section class="screen" id="s-study">
+  <div class="topbar">
+    <button class="back" id="studyBack">← もどる</button>
+    <h2>ことば一覧</h2>
+    <div class="sp"></div>
+  </div>
+  <div class="tabs" id="studyTabs"></div>
+  <div class="count" id="studyCount"></div>
+  <div id="studyList"></div>
+  <button class="start" id="studyToQuiz" style="margin-top:20px">覚えたのでクイズへ</button>
+</section>
+
+<section class="screen" id="s-quiz">
+  <div class="hud">
+    <div class="hearts" id="hearts">♥♥♥</div>
+    <div class="combo" id="combo">3 れんぞく</div>
+    <div class="qcount" id="qcount">1 / 10</div>
+  </div>
+  <div class="bar"><i id="barFill"></i></div>
+  <div class="qcard">
+    <div class="qlabel" id="qlabel">インドネシア語でなんと言う？</div>
+    <div class="qmain" id="qmain">—</div>
+    <div class="qscript" id="qscript"></div>
+  </div>
+  <div class="choices" id="choices"></div>
+  <div class="fb" id="fb"></div>
+  <button class="next" id="btnNext" style="display:none">つぎへ</button>
+</section>
+
+<section class="screen" id="s-result">
+  <div class="rhead">
+    <div class="rscore" id="rscore">0<small>/10</small></div>
+    <div class="rmsg" id="rmsg">—</div>
+    <div class="rsub" id="rsub"></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="stCombo">0</b><span>さいだいコンボ</span></div>
+    <div class="stat"><b id="stAcc">0%</b><span>せいかいりつ</span></div>
+    <div class="stat"><b id="stXp">0</b><span>XP</span></div>
+  </div>
+  <div class="rlist" id="rlist"></div>
+  <div class="rbtns">
+    <button class="again" id="btnAgain">もういちど</button>
+    <button class="home" id="btnHome">最初にもどる</button>
+  </div>
+</section>
+
+</div>
+<script>
+const DATA = [
+ // ===== あいさつ =====
+ {c:"あいさつ", jp:"やあ／こんにちは（カジュアル）", si:"ハロ", sc:"Halo", note:"時間帯を問わず使える。友だち同士なら Hai（ハイ）も。"},
+ {c:"あいさつ", jp:"おはよう", si:"スラマッ パギ", sc:"Selamat pagi", note:"だいたい11時ごろまで。Selamat＝「よい」で時間帯の語が続く。"},
+ {c:"あいさつ", jp:"こんにちは（昼）", si:"スラマッ シアン", sc:"Selamat siang", note:"11時〜15時ごろ。"},
+ {c:"あいさつ", jp:"こんにちは（夕方）", si:"スラマッ ソレ", sc:"Selamat sore", note:"15時〜日没ごろ。日本語にない区切りなので慣れが要る。"},
+ {c:"あいさつ", jp:"こんばんは", si:"スラマッ マラム", sc:"Selamat malam", note:"日没以降。"},
+ {c:"あいさつ", jp:"ありがとう", si:"トゥリマ カシ", sc:"Terima kasih", note:"直訳は「愛情を受け取る」。強めたいときは Terima kasih banyak。"},
+ {c:"あいさつ", jp:"どういたしまして", si:"サマサマ", sc:"Sama-sama", note:"お礼への定番の返し。"},
+ {c:"あいさつ", jp:"ごめんなさい", si:"マアフ", sc:"Maaf", note:"謝罪のほか「失礼ですが」と切り出すときにも。"},
+ {c:"あいさつ", jp:"すみません（声をかける）", si:"プルミシ", sc:"Permisi", note:"人の前を通るとき、店員を呼ぶときに使う。"},
+ {c:"あいさつ", jp:"元気ですか？", si:"アパ カバル？", sc:"Apa kabar?", note:"直訳は「何の知らせ？」。"},
+ {c:"あいさつ", jp:"元気です／いいです", si:"バイッ", sc:"Baik", note:"返事にも「良い」の意味にも使う。Baik-baik saja とも。"},
+ {c:"あいさつ", jp:"またね", si:"サンパイ ジュンパ", sc:"Sampai jumpa", note:"「また会うまで」。Sampai nanti（また後で）も同様。"},
+ {c:"あいさつ", jp:"気をつけて（行く人へ）", si:"スラマッ ジャラン", sc:"Selamat jalan", note:"残る側が言う。去る側は Selamat tinggal。"},
+ {c:"あいさつ", jp:"お願いします／〜してください", si:"トロン", sc:"Tolong", note:"依頼の頭につける。単独だと「助けて」。"},
+
+ // ===== 自己紹介 =====
+ {c:"自己紹介", jp:"わたし", si:"サヤ", sc:"Saya", note:"ていねいな「私」。親しい間では Aku（アク）。"},
+ {c:"自己紹介", jp:"あなた（ていねい）", si:"アンダ", sc:"Anda", note:"目上や初対面に。親しければ Kamu（カム）。"},
+ {c:"自己紹介", jp:"わたしの名前は…", si:"ナマ サヤ …", sc:"Nama saya …", note:"うしろに名前を続ける。"},
+ {c:"自己紹介", jp:"お名前は？", si:"シアパ ナマ アンダ？", sc:"Siapa nama Anda?", note:"Siapa＝だれ。名前を聞くときは Apa ではなく Siapa。"},
+ {c:"自己紹介", jp:"日本から来ました", si:"サヤ ダリ ジュパン", sc:"Saya dari Jepang", note:"dari＝〜から。"},
+ {c:"自己紹介", jp:"はじめまして", si:"スナン ブルトゥム", sc:"Senang bertemu", note:"「会えてうれしい」の意味。"},
+ {c:"自己紹介", jp:"はい", si:"ヤ", sc:"Ya", note:""},
+ {c:"自己紹介", jp:"いいえ", si:"ティダッ", sc:"Tidak", note:"会話では Nggak（ンガッ）と短く言うことも多い。"},
+ {c:"自己紹介", jp:"英語を話せますか？", si:"ビサ バハサ イングリス？", sc:"Bisa bahasa Inggris?", note:"bisa＝できる、bahasa＝言語。"},
+ {c:"自己紹介", jp:"インドネシア語が話せません", si:"サヤ ティダッ ビサ バハサ インドネシア", sc:"Saya tidak bisa bahasa Indonesia", note:""},
+
+ // ===== 数字 =====
+ {c:"数字", jp:"1", si:"サトゥ", sc:"satu", note:""},
+ {c:"数字", jp:"2", si:"ドゥア", sc:"dua", note:""},
+ {c:"数字", jp:"3", si:"ティガ", sc:"tiga", note:""},
+ {c:"数字", jp:"4", si:"ウンパッ", sc:"empat", note:"語尾のtはほとんど聞こえない。"},
+ {c:"数字", jp:"5", si:"リマ", sc:"lima", note:""},
+ {c:"数字", jp:"6", si:"ウナム", sc:"enam", note:""},
+ {c:"数字", jp:"7", si:"トゥジュ", sc:"tujuh", note:""},
+ {c:"数字", jp:"8", si:"ドゥラパン", sc:"delapan", note:""},
+ {c:"数字", jp:"9", si:"スンビラン", sc:"sembilan", note:""},
+ {c:"数字", jp:"10", si:"スプル", sc:"sepuluh", note:""},
+ {c:"数字", jp:"20", si:"ドゥア プル", sc:"dua puluh", note:"「2×10」の形。30は tiga puluh。"},
+ {c:"数字", jp:"100", si:"スラトゥス", sc:"seratus", note:""},
+ {c:"数字", jp:"1000", si:"スリブ", sc:"seribu", note:"ルピアは桁が大きいので、この語をよく聞く。"},
+
+ // ===== 食べ物 =====
+ {c:"食べ物", jp:"水", si:"アイル", sc:"air", note:"飲み水は air putih（アイル プティ）と言うと通じやすい。"},
+ {c:"食べ物", jp:"ごはん（米）", si:"ナシ", sc:"nasi", note:"食事全般を指すこともある。"},
+ {c:"食べ物", jp:"ナシゴレン（炒飯）", si:"ナシ ゴレン", sc:"nasi goreng", note:"goreng＝揚げる・炒める。"},
+ {c:"食べ物", jp:"ミーゴレン（焼きそば）", si:"ミー ゴレン", sc:"mie goreng", note:"mie＝麺。"},
+ {c:"食べ物", jp:"鶏肉", si:"アヤム", sc:"ayam", note:"料理名によく出る。ayam goreng＝フライドチキン。"},
+ {c:"食べ物", jp:"魚", si:"イカン", sc:"ikan", note:""},
+ {c:"食べ物", jp:"牛肉", si:"サピ", sc:"sapi", note:"豚肉は babi。イスラム教徒が多いので扱う店は限られる。"},
+ {c:"食べ物", jp:"野菜", si:"サユル", sc:"sayur", note:""},
+ {c:"食べ物", jp:"くだもの", si:"ブア", sc:"buah", note:""},
+ {c:"食べ物", jp:"卵", si:"トゥルル", sc:"telur", note:""},
+ {c:"食べ物", jp:"パン", si:"ロティ", sc:"roti", note:""},
+ {c:"食べ物", jp:"コーヒー", si:"コピ", sc:"kopi", note:"甘い練乳入りが多い。砂糖抜きは kopi tanpa gula。"},
+ {c:"食べ物", jp:"お茶", si:"テ", sc:"teh", note:"注文すると甘いことが多い。"},
+ {c:"食べ物", jp:"牛乳", si:"スス", sc:"susu", note:""},
+ {c:"食べ物", jp:"氷", si:"エス", sc:"es", note:"冷たい飲み物は es teh のように es をつける。"},
+ {c:"食べ物", jp:"おいしい", si:"ウナッ", sc:"enak", note:"食べながら言うと喜ばれる。"},
+ {c:"食べ物", jp:"辛い", si:"プダス", sc:"pedas", note:""},
+ {c:"食べ物", jp:"甘い", si:"マニス", sc:"manis", note:""},
+ {c:"食べ物", jp:"サンバル（唐辛子ペースト）", si:"サンバル", sc:"sambal", note:"食卓の定番。かなり辛いので少量から。"},
+ {c:"食べ物", jp:"辛くしないでください", si:"ティダッ プダス、ヤ", sc:"Tidak pedas, ya", note:"注文時に添えると加減してくれる。"},
+ {c:"食べ物", jp:"お腹がすいた", si:"サヤ ラパル", sc:"Saya lapar", note:""},
+ {c:"食べ物", jp:"のどがかわいた", si:"サヤ ハウス", sc:"Saya haus", note:""},
+
+ // ===== 買い物 =====
+ {c:"買い物", jp:"いくらですか？", si:"ブラパ ハルガニャ？", sc:"Berapa harganya?", note:"短く Berapa? だけでも通じる。"},
+ {c:"買い物", jp:"高い", si:"マハル", sc:"mahal", note:"値段交渉の起点。"},
+ {c:"買い物", jp:"安い", si:"ムラ", sc:"murah", note:""},
+ {c:"買い物", jp:"まけてもらえますか？", si:"ボレ クラン？", sc:"Boleh kurang?", note:"市場では値段交渉が前提の店も多い。"},
+ {c:"買い物", jp:"これがほしい", si:"サヤ マウ イニ", sc:"Saya mau ini", note:"指さしながら使える。"},
+ {c:"買い物", jp:"いりません", si:"ティダッ マウ", sc:"Tidak mau", note:"客引きを断るときにも。"},
+ {c:"買い物", jp:"ください", si:"ミンタ …", sc:"Minta …", note:"ほしい物の前につける。Minta air＝水ください。"},
+ {c:"買い物", jp:"お金", si:"ウアン", sc:"uang", note:""},
+ {c:"買い物", jp:"ルピア（通貨）", si:"ルピア", sc:"rupiah", note:"桁が大きいので、ゼロの数に注意。"},
+ {c:"買い物", jp:"これ", si:"イニ", sc:"ini", note:""},
+ {c:"買い物", jp:"それ／あれ", si:"イトゥ", sc:"itu", note:""},
+ {c:"買い物", jp:"少し", si:"スディキッ", sc:"sedikit", note:""},
+ {c:"買い物", jp:"たくさん", si:"バニャッ", sc:"banyak", note:"Terima kasih banyak＝どうもありがとう。"},
+
+ // ===== 場所 =====
+ {c:"場所", jp:"どこですか？", si:"ディ マナ？", sc:"Di mana?", note:"場所の語のあとにつける。Toilet di mana?"},
+ {c:"場所", jp:"トイレ", si:"トイレッ", sc:"toilet", note:"kamar kecil（直訳「小さい部屋」）とも言う。"},
+ {c:"場所", jp:"家", si:"ルマ", sc:"rumah", note:""},
+ {c:"場所", jp:"お店", si:"トコ", sc:"toko", note:""},
+ {c:"場所", jp:"市場", si:"パサル", sc:"pasar", note:"朝のうちが活気がある。"},
+ {c:"場所", jp:"ホテル", si:"ホテル", sc:"hotel", note:""},
+ {c:"場所", jp:"部屋", si:"カマル", sc:"kamar", note:""},
+ {c:"場所", jp:"鍵", si:"クンチ", sc:"kunci", note:""},
+ {c:"場所", jp:"病院", si:"ルマ サキッ", sc:"rumah sakit", note:"直訳は「病の家」。"},
+ {c:"場所", jp:"銀行", si:"バンク", sc:"bank", note:""},
+ {c:"場所", jp:"ここ", si:"ディ シニ", sc:"di sini", note:""},
+ {c:"場所", jp:"あそこ", si:"ディ サナ", sc:"di sana", note:""},
+
+ // ===== 移動 =====
+ {c:"移動", jp:"バス", si:"ブス", sc:"bus", note:""},
+ {c:"移動", jp:"電車", si:"クレタ", sc:"kereta", note:"ジャワ島の都市間移動で使いやすい。"},
+ {c:"移動", jp:"駅", si:"スタシウン", sc:"stasiun", note:""},
+ {c:"移動", jp:"空港", si:"バンダラ", sc:"bandara", note:""},
+ {c:"移動", jp:"バイクタクシー", si:"オジェッ", sc:"ojek", note:"配車アプリで呼ぶのが一般的。渋滞に強い。"},
+ {c:"移動", jp:"道／歩く", si:"ジャラン", sc:"jalan", note:"jalan-jalan で「散歩する・出かける」。"},
+ {c:"移動", jp:"まっすぐ", si:"ルルス", sc:"lurus", note:"道案内で使う。"},
+ {c:"移動", jp:"右", si:"カナン", sc:"kanan", note:""},
+ {c:"移動", jp:"左", si:"キリ", sc:"kiri", note:"日本語の「切り」と同じ響きなので覚えやすい。"},
+ {c:"移動", jp:"ここで止めてください", si:"ブルフンティ ディ シニ", sc:"Berhenti di sini", note:""},
+ {c:"移動", jp:"行く", si:"プルギ", sc:"pergi", note:""},
+ {c:"移動", jp:"渋滞", si:"マチェッ", sc:"macet", note:"ジャカルタでは日常的に聞く語。"},
+
+ // ===== 困ったとき =====
+ {c:"困ったとき", jp:"わかりません", si:"サヤ ティダッ ムングルティ", sc:"Saya tidak mengerti", note:""},
+ {c:"困ったとき", jp:"助けてください", si:"トロン バントゥ サヤ", sc:"Tolong bantu saya", note:""},
+ {c:"困ったとき", jp:"ちょっと待って", si:"トゥング スブンタル", sc:"Tunggu sebentar", note:""},
+ {c:"困ったとき", jp:"ゆっくり話してください", si:"プラン プラン", sc:"Pelan-pelan", note:"同じ語を重ねる言い方はインドネシア語によくある形。"},
+ {c:"困ったとき", jp:"もう一度お願いします", si:"ウランギ ラギ", sc:"Ulangi lagi", note:""},
+ {c:"困ったとき", jp:"道に迷いました", si:"サヤ トゥルスサッ", sc:"Saya tersesat", note:""},
+ {c:"困ったとき", jp:"できません", si:"ティダッ ビサ", sc:"Tidak bisa", note:""},
+ {c:"困ったとき", jp:"できます", si:"ビサ", sc:"bisa", note:""},
+ {c:"困ったとき", jp:"気をつけて", si:"ハティハティ", sc:"Hati-hati", note:"hati＝心。重ねて「注意して」の意味になる。"},
+
+ // ===== 体調 =====
+ {c:"体調", jp:"具合が悪いです", si:"サヤ サキッ", sc:"Saya sakit", note:"sakit＝痛い・病気。"},
+ {c:"体調", jp:"頭が痛い", si:"クパラ サヤ サキッ", sc:"Kepala saya sakit", note:"kepala＝頭。"},
+ {c:"体調", jp:"お腹が痛い", si:"プルッ サヤ サキッ", sc:"Perut saya sakit", note:"食あたりのときに。"},
+ {c:"体調", jp:"医者", si:"ドクトゥル", sc:"dokter", note:""},
+ {c:"体調", jp:"薬", si:"オバッ", sc:"obat", note:"薬局は apotek（アポテッ）。"},
+ {c:"体調", jp:"疲れました", si:"サヤ チャペッ", sc:"Saya capek", note:""},
+
+ // ===== 家族 =====
+ {c:"家族", jp:"母／年上の女性への敬称", si:"イブ", sc:"ibu", note:"見知らぬ年上女性への呼びかけにも使う。略して Bu。"},
+ {c:"家族", jp:"父／年上の男性への敬称", si:"バパッ", sc:"bapak", note:"見知らぬ年上男性への呼びかけにも使う。略して Pak。"},
+ {c:"家族", jp:"兄・姉", si:"カカッ", sc:"kakak", note:"性別の区別なく年上のきょうだいを指す。"},
+ {c:"家族", jp:"弟・妹", si:"アディッ", sc:"adik", note:"こちらも性別の区別なし。"},
+ {c:"家族", jp:"子ども", si:"アナッ", sc:"anak", note:""},
+ {c:"家族", jp:"友だち", si:"トゥマン", sc:"teman", note:""},
+ {c:"家族", jp:"妻", si:"イストリ", sc:"istri", note:""},
+ {c:"家族", jp:"夫", si:"スアミ", sc:"suami", note:""},
+ {c:"家族", jp:"お兄さん（呼びかけ）", si:"マス", sc:"mas", note:"ジャワ由来。店員や若い男性への呼びかけに日常的に使う。"},
+ {c:"家族", jp:"お姉さん（呼びかけ）", si:"ンバッ", sc:"mbak", note:"同じくジャワ由来。若い女性への呼びかけ。"},
+
+ // ===== 時間 =====
+ {c:"時間", jp:"今", si:"スカラン", sc:"sekarang", note:""},
+ {c:"時間", jp:"あとで", si:"ナンティ", sc:"nanti", note:""},
+ {c:"時間", jp:"朝", si:"パギ", sc:"pagi", note:""},
+ {c:"時間", jp:"昼", si:"シアン", sc:"siang", note:""},
+ {c:"時間", jp:"夕方", si:"ソレ", sc:"sore", note:""},
+ {c:"時間", jp:"夜", si:"マラム", sc:"malam", note:""},
+ {c:"時間", jp:"今日", si:"ハリ イニ", sc:"hari ini", note:"hari＝日。"},
+ {c:"時間", jp:"明日", si:"ベソッ", sc:"besok", note:""},
+ {c:"時間", jp:"昨日", si:"クマリン", sc:"kemarin", note:""},
+ {c:"時間", jp:"何時ですか？", si:"ジャム ブラパ？", sc:"Jam berapa?", note:"jam＝時刻・時計。"},
+
+ // ===== 自然 =====
+ {c:"自然", jp:"雨", si:"フジャン", sc:"hujan", note:"雨季はスコールが多い。"},
+ {c:"自然", jp:"暑い", si:"パナス", sc:"panas", note:"熱い飲み物にも使う。kopi panas＝ホットコーヒー。"},
+ {c:"自然", jp:"寒い／冷たい", si:"ディンギン", sc:"dingin", note:""},
+ {c:"自然", jp:"海", si:"ラウッ", sc:"laut", note:""},
+ {c:"自然", jp:"山", si:"グヌン", sc:"gunung", note:"火山が多く、地名にもよく入る。"},
+ {c:"自然", jp:"川", si:"スンガイ", sc:"sungai", note:""},
+ {c:"自然", jp:"ビーチ", si:"パンタイ", sc:"pantai", note:""},
+ {c:"自然", jp:"猫", si:"クチン", sc:"kucing", note:""},
+ {c:"自然", jp:"犬", si:"アンジン", sc:"anjing", note:""},
+
+ // ===== 動詞 =====
+ {c:"動詞", jp:"食べる", si:"マカン", sc:"makan", note:"makan siang＝昼食。"},
+ {c:"動詞", jp:"飲む", si:"ミヌム", sc:"minum", note:""},
+ {c:"動詞", jp:"来る", si:"ダタン", sc:"datang", note:""},
+ {c:"動詞", jp:"見る", si:"リハッ", sc:"lihat", note:""},
+ {c:"動詞", jp:"話す", si:"ビチャラ", sc:"bicara", note:""},
+ {c:"動詞", jp:"知っている", si:"タウ", sc:"tahu", note:"同じつづりで「豆腐」の意味もある。文脈で判断する。"},
+ {c:"動詞", jp:"ほしい／〜したい", si:"マウ", sc:"mau", note:"動詞の前に置くと「〜したい」。Saya mau makan。"},
+ {c:"動詞", jp:"帰る", si:"プラン", sc:"pulang", note:""},
+ {c:"動詞", jp:"寝る", si:"ティドゥル", sc:"tidur", note:""},
+ {c:"動詞", jp:"買う", si:"ブリ", sc:"beli", note:""},
+
+ // ===== 形容詞 =====
+ {c:"形容詞", jp:"大きい", si:"ブサル", sc:"besar", note:""},
+ {c:"形容詞", jp:"小さい", si:"クチル", sc:"kecil", note:""},
+ {c:"形容詞", jp:"良い／素敵", si:"バグス", sc:"bagus", note:"物や景色をほめるときに使う。"},
+ {c:"形容詞", jp:"きれい（女性・景色）", si:"チャンティッ", sc:"cantik", note:""},
+ {c:"形容詞", jp:"悪い／ひどい", si:"ジュレッ", sc:"jelek", note:""},
+ {c:"形容詞", jp:"新しい", si:"バル", sc:"baru", note:""},
+ {c:"形容詞", jp:"古い／長い（時間）", si:"ラマ", sc:"lama", note:""},
+ {c:"形容詞", jp:"にぎやか／混んでいる", si:"ラマイ", sc:"ramai", note:""},
+
+ // ===== 日常 =====
+ {c:"日常", jp:"何？", si:"アパ？", sc:"Apa?", note:""},
+ {c:"日常", jp:"なぜ？", si:"クナパ？", sc:"Kenapa?", note:"Mengapa（ムンガパ）はよりかたい言い方。"},
+ {c:"日常", jp:"だれ？", si:"シアパ？", sc:"Siapa?", note:""},
+ {c:"日常", jp:"いつ？", si:"カパン？", sc:"Kapan?", note:""},
+ {c:"日常", jp:"どうやって？", si:"バガイマナ？", sc:"Bagaimana?", note:"会話では Gimana（ギマナ）と短くなる。"},
+ {c:"日常", jp:"わかりました／OK", si:"オケ", sc:"Oke", note:"Baik も同じように使える。"},
+ {c:"日常", jp:"もちろん", si:"トゥントゥ サジャ", sc:"Tentu saja", note:""},
+ {c:"日常", jp:"たぶん", si:"ムンキン", sc:"Mungkin", note:""},
+ {c:"日常", jp:"大丈夫です／気にしないで", si:"ティダッ アパアパ", sc:"Tidak apa-apa", note:"直訳は「何でもない」。謝られたときの返しにも使える。"},
+ {c:"日常", jp:"まだです", si:"ブルム", sc:"Belum", note:"「もう食べた?」に対して「まだ」と答えるときなど、よく使う。"}
+];
+
+const CATS = ["あいさつ","自己紹介","数字","食べ物","買い物","場所","移動","困ったとき","体調","家族","時間","自然","動詞","形容詞","日常"];
+
+/* ===== 多層パララックス：層ごとに速度を変える ===== */
+const layers=[
+  {el:document.getElementById("sun"), k:0.10},
+  {el:document.getElementById("L1"),  k:0.16},
+  {el:document.getElementById("L2"),  k:0.30},
+  {el:document.getElementById("L3"),  k:0.48},
+  {el:document.getElementById("L4"),  k:0.70}
+];
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let ticking=false;
+function onScroll(){
+  if(reduce||ticking)return;
+  ticking=true;
+  requestAnimationFrame(()=>{
+    const y=window.scrollY||window.pageYOffset;
+    for(const L of layers){ if(L.el) L.el.style.transform="translate3d(0,"+(-y*L.k)+"px,0)"; }
+    ticking=false;
+  });
+}
+window.addEventListener("scroll",onScroll,{passive:true});
+
+/* ===== 状態 ===== */
+let mode="jp2si", scriptOn=false, qLen=10, cats=[...CATS];
+let queue=[], idx=0, lives=3, correct=0, combo=0, maxCombo=0, xp=0, misses=[], locked=false;
+const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+const show=id=>{document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  document.getElementById(id).classList.add("on");window.scrollTo(0,0);onScroll();};
+
+/* ===== 設定UI ===== */
+const catBox=document.getElementById("catOpts");
+function syncCats(){
+  cats=[...catBox.querySelectorAll(".sel")].map(x=>x.dataset.cat);
+  const btn=document.getElementById("btnStart");
+  btn.disabled=(cats.length===0); btn.style.opacity=cats.length?1:.4;
+}
+CATS.forEach(c=>{
+  const n=DATA.filter(d=>d.c===c).length;
+  const b=document.createElement("button");
+  b.className="opt cat sel"; b.dataset.cat=c; b.textContent=c+" "+n;
+  b.onclick=()=>{b.classList.toggle("sel");syncCats();};
+  catBox.appendChild(b);
+});
+document.getElementById("selAll").onclick=()=>{catBox.querySelectorAll(".opt").forEach(b=>b.classList.add("sel"));syncCats();};
+document.getElementById("selNone").onclick=()=>{catBox.querySelectorAll(".opt").forEach(b=>b.classList.remove("sel"));syncCats();};
+function pickGroup(box,attr,cb){
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    box.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel"); cb(b.dataset[attr]);
+  });
+}
+pickGroup(document.getElementById("modeOpts"),"mode",v=>mode=v);
+pickGroup(document.getElementById("scriptOpts"),"script",v=>scriptOn=(v==="on"));
+pickGroup(document.getElementById("lenOpts"),"len",v=>qLen=parseInt(v,10));
+syncCats();
+
+/* ===== 一覧 ===== */
+let studyCat="あいさつ";
+const tabBox=document.getElementById("studyTabs");
+CATS.forEach((c,i)=>{
+  const b=document.createElement("button");
+  b.className="tab"+(i===0?" on":""); b.textContent=c;
+  b.onclick=()=>{
+    tabBox.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); studyCat=c; renderStudy();
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+  tabBox.appendChild(b);
+});
+function renderStudy(){
+  const list=DATA.filter(d=>d.c===studyCat);
+  document.getElementById("studyCount").textContent=studyCat+"　"+list.length+"語";
+  document.getElementById("studyList").innerHTML=list.map(d=>
+    "<div class='card'><div class='jp'>"+d.jp+"</div><div class='kana'>"+d.si+"</div>"+
+    "<div class='sc'>"+d.sc+"</div>"+(d.note?"<div class='nt'>"+d.note+"</div>":"")+"</div>"
+  ).join("");
+}
+
+/* ===== クイズ ===== */
+function buildQuiz(){
+  const pool=DATA.filter(d=>cats.includes(d.c));
+  queue=shuffle(pool).slice(0,Math.min(qLen,pool.length));
+  idx=0;lives=3;correct=0;combo=0;maxCombo=0;xp=0;misses=[];
+}
+function render(){
+  const q=queue[idx];
+  const dir = mode==="mix" ? (Math.random()<.5?"jp2si":"si2jp") : mode;
+  q._dir=dir; locked=false;
+
+  document.getElementById("hearts").textContent="♥".repeat(lives)+"♡".repeat(3-lives);
+  document.getElementById("qcount").textContent=(idx+1)+" / "+queue.length;
+  document.getElementById("barFill").style.width=(idx/queue.length*100)+"%";
+  const cb=document.getElementById("combo");
+  if(combo>=2){cb.textContent=combo+" れんぞく";cb.classList.add("on");}else cb.classList.remove("on");
+
+  const qm=document.getElementById("qmain"), qs=document.getElementById("qscript");
+  if(dir==="jp2si"){
+    document.getElementById("qlabel").textContent="インドネシア語でなんと言う？";
+    qm.textContent=q.jp; qm.classList.remove("kana"); qs.classList.remove("show");
+  }else{
+    document.getElementById("qlabel").textContent="どういう意味？";
+    qm.textContent=q.si; qm.classList.add("kana");
+    if(scriptOn){qs.textContent=q.sc;qs.classList.add("show");}else qs.classList.remove("show");
+  }
+
+  const key = dir==="jp2si" ? "si" : "jp";
+  let same=DATA.filter(d=>d!==q && d.c===q.c && d[key]!==q[key]);
+  let other=DATA.filter(d=>d!==q && d.c!==q.c && d[key]!==q[key]);
+  let wrongs=shuffle(same).slice(0,3);
+  if(wrongs.length<3) wrongs=wrongs.concat(shuffle(other).slice(0,3-wrongs.length));
+  const list=shuffle([q,...wrongs]);
+
+  const box=document.getElementById("choices");box.innerHTML="";
+  list.forEach(item=>{
+    const b=document.createElement("button");
+    b.className="ch";b.textContent=item[key];
+    b.onclick=()=>answer(b,item,q);
+    box.appendChild(b);
+  });
+  document.getElementById("fb").className="fb";
+  document.getElementById("btnNext").style.display="none";
+}
+function answer(btn,picked,q){
+  if(locked)return; locked=true;
+  const key = q._dir==="jp2si" ? "si" : "jp";
+  const ok = picked===q;
+  document.querySelectorAll(".ch").forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===q[key])b.classList.add("right");
+    else if(b===btn)b.classList.add("bad");
+    else b.classList.add("mute");
+  });
+  const tailHTML="<span class='sp2'>（"+q.sc+"）</span>"+(q.note?"<span class='note'>"+q.note+"</span>":"");
+  const fb=document.getElementById("fb");
+  if(ok){
+    correct++;combo++;maxCombo=Math.max(maxCombo,combo);
+    xp += 10 + Math.min(combo-1,5)*3;
+    fb.className="fb on good";
+    fb.innerHTML="<b>せいかい</b>　"+q.jp+" ＝ "+q.si+" "+tailHTML;
+  }else{
+    combo=0;lives--;misses.push(q);
+    fb.className="fb on bad";
+    fb.innerHTML="<b>おしい</b>　正解は「"+q[key]+"」<br>"+q.jp+" ＝ "+q.si+" "+tailHTML;
+  }
+  const nx=document.getElementById("btnNext");
+  nx.style.display="block";
+  nx.textContent = (lives<=0 || idx>=queue.length-1) ? "けっかを見る" : "つぎへ";
+}
+document.getElementById("btnNext").onclick=()=>{
+  if(lives<=0 || idx>=queue.length-1){finish();return;}
+  idx++;render();
+};
+function finish(){
+  const done=idx+1;
+  document.getElementById("rscore").innerHTML=correct+"<small>/"+done+"</small>";
+  const acc=done?Math.round(correct/done*100):0;
+  document.getElementById("stCombo").textContent=maxCombo;
+  document.getElementById("stAcc").textContent=acc+"%";
+  document.getElementById("stXp").textContent=xp;
+  let msg,sub;
+  if(lives<=0){msg="ライフ切れ";sub="一覧にもどって、間違えた語だけ読み直すと早く入ります。";}
+  else if(acc===100){msg="全問正解";sub="このジャンルは仕上がっています。別のジャンルか、むきを変えて試してください。";}
+  else if(acc>=70){msg="いい調子";sub="あと少しで満点。取りこぼした語だけ覚え直すのが早いです。";}
+  else{msg="ここからです";sub="ジャンルを2つくらいに絞ると、ぐっと覚えやすくなります。";}
+  document.getElementById("rmsg").textContent=msg;
+  document.getElementById("rsub").textContent=sub;
+  const rl=document.getElementById("rlist");
+  rl.innerHTML = misses.length
+    ? "<h3>まちがえたことば</h3>"+misses.map(m=>
+        "<div class='card'><div class='jp'>"+m.jp+"</div><div class='kana'>"+m.si+"</div>"+
+        "<div class='sc'>"+m.sc+"</div>"+(m.note?"<div class='nt'>"+m.note+"</div>":"")+"</div>").join("")
+    : "";
+  show("s-result");
+}
+
+/* ===== 遷移 ===== */
+document.getElementById("btnStudy").onclick=()=>{renderStudy();show("s-study");};
+document.getElementById("studyBack").onclick=()=>show("s-home");
+function openSetup(){
+  const box=document.getElementById("setupBox");
+  box.style.display="block";
+  setTimeout(()=>box.scrollIntoView({behavior:"smooth",block:"start"}),60);
+}
+document.getElementById("btnToQuiz").onclick=openSetup;
+document.getElementById("studyToQuiz").onclick=()=>{show("s-home");openSetup();};
+document.getElementById("btnStart").onclick=()=>{if(!cats.length)return;buildQuiz();show("s-quiz");render();};
+document.getElementById("btnAgain").onclick=()=>{buildQuiz();show("s-quiz");render();};
+document.getElementById("btnHome").onclick=()=>show("s-home");
+renderStudy();
+</script>
+</body>
+</html>
